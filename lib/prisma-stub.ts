@@ -95,9 +95,9 @@ export const prismaClient = {
       const stmt = db.prepare(
         `UPDATE accounts SET ${setClause}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`
       );
-      stmt.run(...values);
+      stmt.run(values);
 
-      return this.findUnique({ where });
+      return (this as any).findUnique({ where }) ?? null;
     },
   },
   user: {
