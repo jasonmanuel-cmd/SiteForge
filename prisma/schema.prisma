@@ -1,0 +1,406 @@
+// Prisma schema for Construction Management SaaS
+// Multi-tenant architecture with full feature support
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// CORE MULTI-TENANT & USER MANAGEMENT
+// ============================================
+
+model Account {
+  id              String   @id @default(uuid())
+  companyName     String
+  planType        String   @default("trial") // trial, basic, pro, enterprise
+  status          String   @default("active") // active, suspended, cancelled
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // QuickBooks Integration
+  qbRealmId       String?  @unique
+  qbAccessToken   String?  @db.Text
+  qbRefreshToken  String?  @db.Text
+  qbTokenExpiry   DateTime?
+
+  // Email Integration
+  emailProvider   String?  // gmail, microsoft
+  emailAccessToken String? @db.Text
+  emailRefreshToken String? @db.Text
+  emailTokenExpiry DateTime?
+
+  // Relations
+  users           User[]
+  projects        Project[]
+  contacts        Contact[]
+  rfis            RFI[]
+  changeOrders    ChangeOrder[]
+  invoices        Invoice[]
+  dailyReports    DailyReport[]
+  files           File[]
+  aiEvents        AIEvent[]
+
+  @@map("accounts")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  accountId       String
+  email           String   @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  role            String   // owner, pm, super, bookkeeper
+  phoneNumber     String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdRFIs     RFI[]    @relation("CreatedBy")
+  createdCOs      ChangeOrder[] @relation("CreatedBy")
+  createdReports  DailyReport[] @relation("CreatedBy")
+
+  @@index([accountId])
+  @@index([email])
+  @@map("users")
+}
+
+// ============================================
+// PROJECT MANAGEMENT
+// ============================================
+
+model Project {
+  id              String   @id @default(uuid())
+  accountId       String
+  name            String
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+  status          String   @default("active") // active, on_hold, completed, cancelled
+  startDate       DateTime?
+  endDate         DateTime?
+  estimatedBudget Decimal? @db.Decimal(12, 2)
+  actualCost      Decimal  @default(0) @db.Decimal(12, 2)
+
+  // QuickBooks Integration
+  qbJobId         String?
+  qbClassName     String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  rfis            RFI[]
+  changeOrders    ChangeOrder[]
+  invoices        Invoice[]
+  dailyReports    DailyReport[]
+  files           File[]
+
+  @@index([accountId])
+  @@index([status])
+  @@map("projects")
+}
+
+model Contact {
+  id              String   @id @default(uuid())
+  accountId       String
+  type            String   // owner, architect, sub, vendor, other
+  companyName     String?
+  firstName       String
+  lastName        String
+  email           String?
+  phoneNumber     String?
+  role            String?
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  rfisFrom        RFI[]    @relation("RFIFrom")
+  rfisTo          RFI[]    @relation("RFITo")
+  changeOrders    ChangeOrder[]
+  invoices        Invoice[]
+
+  @@index([accountId])
+  @@index([email])
+  @@map("contacts")
+}
+
+// ============================================
+// RFIs & CHANGE ORDERS
+// ============================================
+
+model RFI {
+  id              String   @id @default(uuid())
+  accountId       String
+  projectId       String
+  rfiNumber       String   // Auto-generated: RFI-001, RFI-002
+  subject         String
+  question        String   @db.Text
+  response        String?  @db.Text
+  status          String   @default("draft") // draft, sent, responded, closed
+  priority        String   @default("normal") // low, normal, high, urgent
+
+  fromContactId   String?
+  toContactId     String?
+
+  dueDate         DateTime?
+  sentDate        DateTime?
+  responseDate    DateTime?
+
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // AI metadata
+  aiGenerated     Boolean  @default(false)
+  aiConfidence    Decimal? @db.Decimal(3, 2) // 0.00 to 1.00
+  sourceEmailId   String?
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fromContact     Contact? @relation("RFIFrom", fields: [fromContactId], references: [id])
+  toContact       Contact? @relation("RFITo", fields: [toContactId], references: [id])
+  createdBy       User     @relation("CreatedBy", fields: [createdById], references: [id])
+
+  @@index([accountId])
+  @@index([projectId])
+  @@index([status])
+  @@map("rfis")
+}
+
+model ChangeOrder {
+  id              String   @id @default(uuid())
+  accountId       String
+  projectId       String
+  coNumber        String   // Auto-generated: CO-001, CO-002
+  title           String
+  description     String   @db.Text
+  reason          String?  @db.Text
+  status          String   @default("draft") // draft, pending, approved, rejected, completed
+
+  // Financial Impact
+  priceImpact     Decimal  @default(0) @db.Decimal(12, 2)
+  scheduleImpact  Int      @default(0) // days
+
+  contactId       String?
+
+  submittedDate   DateTime?
+  approvedDate    DateTime?
+  rejectedDate    DateTime?
+  rejectionReason String?  @db.Text
+
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // AI metadata
+  aiGenerated     Boolean  @default(false)
+  aiConfidence    Decimal? @db.Decimal(3, 2)
+  sourceEmailId   String?
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contact         Contact? @relation(fields: [contactId], references: [id])
+  createdBy       User     @relation("CreatedBy", fields: [createdById], references: [id])
+
+  @@index([accountId])
+  @@index([projectId])
+  @@index([status])
+  @@map("change_orders")
+}
+
+// ============================================
+// INVOICES & FINANCIALS
+// ============================================
+
+model Invoice {
+  id              String   @id @default(uuid())
+  accountId       String
+  projectId       String
+  vendorId        String?
+
+  invoiceNumber   String?
+  invoiceDate     DateTime?
+  dueDate         DateTime?
+
+  subtotal        Decimal  @default(0) @db.Decimal(12, 2)
+  tax             Decimal  @default(0) @db.Decimal(12, 2)
+  total           Decimal  @default(0) @db.Decimal(12, 2)
+
+  status          String   @default("pending") // pending, approved, paid, disputed
+  category        String?  // materials, labor, equipment, other
+  costCode        String?
+
+  // QuickBooks Integration
+  qbTxnId         String?  @unique
+  qbSyncedAt      DateTime?
+
+  // Multi-job split support
+  isMultiJob      Boolean  @default(false)
+  allocations     Json?    // [{projectId, amount, percentage}]
+
+  notes           String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // AI metadata
+  aiExtracted     Boolean  @default(false)
+  aiConfidence    Decimal? @db.Decimal(3, 2)
+  rawExtraction   Json?    // Store raw OCR/AI output
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  vendor          Contact? @relation(fields: [vendorId], references: [id])
+  lineItems       InvoiceLineItem[]
+
+  @@index([accountId])
+  @@index([projectId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id              String   @id @default(uuid())
+  invoiceId       String
+  description     String
+  quantity        Decimal  @db.Decimal(10, 2)
+  unitPrice       Decimal  @db.Decimal(10, 2)
+  amount          Decimal  @db.Decimal(12, 2)
+  category        String?
+
+  // Relations
+  invoice         Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_line_items")
+}
+
+// ============================================
+// DAILY REPORTS
+// ============================================
+
+model DailyReport {
+  id              String   @id @default(uuid())
+  accountId       String
+  projectId       String
+  reportDate      DateTime
+
+  weatherAM       String?
+  weatherPM       String?
+  temperature     String?
+
+  workPerformed   String?  @db.Text
+  laborSummary    Json?    // [{trade, workers, hours}]
+  equipmentUsed   String?  @db.Text
+  deliveries      String?  @db.Text
+
+  delays          String?  @db.Text
+  safetyIssues    String?  @db.Text
+  photos          Json?    // [fileIds]
+
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Voice input metadata
+  voiceRecorded   Boolean  @default(false)
+  transcriptId    String?
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy       User     @relation("CreatedBy", fields: [createdById], references: [id])
+
+  @@index([accountId])
+  @@index([projectId])
+  @@index([reportDate])
+  @@map("daily_reports")
+}
+
+// ============================================
+// FILES & DOCUMENTS
+// ============================================
+
+model File {
+  id              String   @id @default(uuid())
+  accountId       String
+  projectId       String?
+
+  fileName        String
+  fileType        String   // pdf, jpg, png, mp3, etc.
+  mimeType        String
+  fileSize        Int      // bytes
+  storagePath     String   // S3/storage path
+  storageUrl      String?  @db.Text
+
+  // Polymorphic relations - what this file is attached to
+  linkedEntityType String? // rfi, change_order, invoice, daily_report
+  linkedEntityId   String?
+
+  uploadedAt      DateTime @default(now())
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  project         Project? @relation(fields: [projectId], references: [id])
+
+  @@index([accountId])
+  @@index([projectId])
+  @@index([linkedEntityType, linkedEntityId])
+  @@map("files")
+}
+
+// ============================================
+// AI & AUTOMATION
+// ============================================
+
+model AIEvent {
+  id              String   @id @default(uuid())
+  accountId       String
+  eventType       String   // email_rfi, email_co, invoice_upload, voice_daily
+  status          String   @default("processing") // processing, completed, failed, needs_review
+
+  // Input data
+  rawInput        Json     // Store original email, file metadata, etc.
+
+  // AI Processing
+  aiProvider      String?  // openai, anthropic, etc.
+  aiModel         String?
+  aiPrompt        String?  @db.Text
+  aiResponse      Json?
+  aiConfidence    Decimal? @db.Decimal(3, 2)
+
+  // Output - what was created
+  createdEntityType String? // rfi, change_order, invoice, daily_report
+  createdEntityId   String?
+
+  processingTime  Int?     // milliseconds
+  errorMessage    String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([eventType])
+  @@index([status])
+  @@index([createdAt])
+  @@map("ai_events")
+}

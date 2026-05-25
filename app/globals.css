@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* SiteForge Brand */
+  --sf-charcoal: #1C2B3A;
+  --sf-charcoal-dark: #0f1a24;
+  --sf-amber: #D97706;
+  --sf-amber-dark: #B45309;
+  --sf-amber-light: #FDE68A;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Animated Circuit Board Background */
+.circuit-bg {
+  background-color: #0a0e27;
+  background-image:
+    linear-gradient(rgba(217, 119, 6, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 119, 6, 0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+.circuit-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(217, 119, 6, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(28, 43, 58, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(217, 119, 6, 0.08) 0%, transparent 50%);
+  animation: pulse-circuit 8s ease-in-out infinite;
+}
+
+@keyframes pulse-circuit {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Glowing dots — SiteForge amber nodes */
+.circuit-dots {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle, rgba(217, 119, 6, 0.7) 2px, transparent 2px),
+    radial-gradient(circle, rgba(180, 83, 9, 0.5) 1px, transparent 1px);
+  background-size: 100px 100px, 150px 150px;
+  background-position: 0 0, 75px 75px;
+  animation: float-circuit 20s linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes float-circuit {
+  from { background-position: 0 0, 75px 75px; }
+  to { background-position: 100px 100px, 175px 175px; }
+}
+
+/* Animations */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 1; transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.animate-slide-up { animation: slide-up 0.3s ease-out; }
+.animate-fade-in { animation: fade-in 0.5s ease-in; }
+.animate-bounce-in { animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
