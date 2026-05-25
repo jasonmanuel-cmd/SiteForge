@@ -15,7 +15,7 @@ const QB_ENVIRONMENT = process.env.QB_ENVIRONMENT || 'sandbox'
 /**
  * Create OAuth client
  */
-export function createOAuthClient(): OAuthClient {
+export function createOAuthClient() {
   return new OAuthClient({
     clientId: QB_CLIENT_ID,
     clientSecret: QB_CLIENT_SECRET,

@@ -5,8 +5,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
 const TRADE_PROMPTS: Record<string, string> = {
   framing: `You are an expert framing contractor. Calculate a detailed estimate for wall framing. Return ONLY JSON.`,
   drywall: `You are an expert drywall contractor. Calculate a detailed estimate for drywall installation. Return ONLY JSON.`,
@@ -160,6 +158,7 @@ Respond with ONLY this JSON (no markdown):
   "notes": "any important notes"
 }`
 
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
