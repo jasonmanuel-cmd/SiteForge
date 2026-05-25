@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getMockData, mockAccount, mockUsers } from '@/lib/mockData'
+import { getMockData } from '@/lib/mockData'
 import Link from 'next/link'
 import DemoTour from '@/components/DemoTour'
 import AIChatbot from '@/components/AIChatbot'
@@ -19,11 +19,7 @@ export default function DashboardPage() {
     const accountData = localStorage.getItem('account')
 
     if (!token || !userData || !accountData) {
-      setUser(mockUsers[0])
-      setAccount(mockAccount)
-      localStorage.setItem('user', JSON.stringify(mockUsers[0]))
-      localStorage.setItem('account', JSON.stringify(mockAccount))
-      setLoading(false)
+      router.push('/login')
       return
     }
 

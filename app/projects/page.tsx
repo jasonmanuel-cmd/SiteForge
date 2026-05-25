@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getMockData, mockAccount, mockUsers } from '@/lib/mockData'
+import { getMockData } from '@/lib/mockData'
 import Link from 'next/link'
 import DemoTour from '@/components/DemoTour'
 import AIChatbot from '@/components/AIChatbot'
@@ -22,14 +22,11 @@ export default function ProjectsPage() {
     const accountData = localStorage.getItem('account')
 
     if (!userData || !accountData) {
-      setUser(mockUsers[0])
-      setAccount(mockAccount)
-      localStorage.setItem('user', JSON.stringify(mockUsers[0]))
-      localStorage.setItem('account', JSON.stringify(mockAccount))
-    } else {
-      setUser(JSON.parse(userData))
-      setAccount(JSON.parse(accountData))
+      router.push('/login')
+      return
     }
+    setUser(JSON.parse(userData))
+    setAccount(JSON.parse(accountData))
     const savedProjects = localStorage.getItem('localProjects')
     if (savedProjects) setLocalProjects(JSON.parse(savedProjects))
     setLoading(false)
