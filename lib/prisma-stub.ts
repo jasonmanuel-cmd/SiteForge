@@ -4,9 +4,42 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import bcrypt from 'bcryptjs';
 
-const dbPath = path.join(process.cwd(), 'public', 'dev.db');
+const dbPath = process.env.DATABASE_URL
+  ? (process.env.DATABASE_URL.startsWith('file:') ? process.env.DATABASE_URL.slice(5) : process.env.DATABASE_URL)
+  : '/tmp/siteforge.db';
+
+function ensureSchema(db: any) {
+  const count = db.prepare("SELECT count(*) as c FROM sqlite_master WHERE type='table' AND name='accounts'").get() as any;
+  if (count.c > 0) return;
+
+  db.exec(`
+    CREATE TABLE accounts (id TEXT PRIMARY KEY, companyName TEXT NOT NULL, planType TEXT DEFAULT 'trial', status TEXT DEFAULT 'active', createdAt DATETIME, updatedAt DATETIME, qbRealmId TEXT UNIQUE, qbAccessToken TEXT, qbRefreshToken TEXT, qbTokenExpiry DATETIME, emailProvider TEXT, emailAccessToken TEXT, emailRefreshToken TEXT, emailTokenExpiry DATETIME);
+    CREATE TABLE users (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, email TEXT UNIQUE NOT NULL, passwordHash TEXT NOT NULL, firstName TEXT NOT NULL, lastName TEXT NOT NULL, role TEXT NOT NULL, phoneNumber TEXT, isActive INTEGER DEFAULT 1, createdAt DATETIME, updatedAt DATETIME, FOREIGN KEY (accountId) REFERENCES accounts(id));
+    CREATE TABLE projects (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, name TEXT NOT NULL, address TEXT, city TEXT, state TEXT, zipCode TEXT, status TEXT DEFAULT 'active', startDate DATETIME, endDate DATETIME, estimatedBudget REAL, actualCost REAL DEFAULT 0, qbJobId TEXT, qbClassName TEXT, createdAt DATETIME, updatedAt DATETIME, FOREIGN KEY (accountId) REFERENCES accounts(id));
+    CREATE TABLE contacts (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, type TEXT NOT NULL, companyName TEXT, firstName TEXT NOT NULL, lastName TEXT NOT NULL, email TEXT, phoneNumber TEXT, role TEXT, notes TEXT, createdAt DATETIME, updatedAt DATETIME, FOREIGN KEY (accountId) REFERENCES accounts(id));
+    CREATE TABLE rfis (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, projectId TEXT NOT NULL, rfiNumber TEXT NOT NULL, subject TEXT NOT NULL, question TEXT NOT NULL, response TEXT, status TEXT DEFAULT 'draft', priority TEXT DEFAULT 'normal', fromContactId TEXT, toContactId TEXT, dueDate DATETIME, sentDate DATETIME, responseDate DATETIME, createdById TEXT NOT NULL, createdAt DATETIME, updatedAt DATETIME, aiGenerated INTEGER DEFAULT 0, aiConfidence REAL, sourceEmailId TEXT);
+    CREATE TABLE change_orders (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, projectId TEXT NOT NULL, coNumber TEXT NOT NULL, title TEXT NOT NULL, description TEXT NOT NULL, reason TEXT, status TEXT DEFAULT 'draft', priceImpact REAL DEFAULT 0, scheduleImpact INTEGER DEFAULT 0, contactId TEXT, submittedDate DATETIME, approvedDate DATETIME, rejectedDate DATETIME, rejectionReason TEXT, createdById TEXT NOT NULL, createdAt DATETIME, updatedAt DATETIME, aiGenerated INTEGER DEFAULT 0, aiConfidence REAL, sourceEmailId TEXT);
+    CREATE TABLE invoices (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, projectId TEXT NOT NULL, vendorId TEXT, invoiceNumber TEXT, invoiceDate DATETIME, dueDate DATETIME, subtotal REAL DEFAULT 0, tax REAL DEFAULT 0, total REAL DEFAULT 0, status TEXT DEFAULT 'pending', category TEXT, costCode TEXT, qbTxnId TEXT UNIQUE, qbSyncedAt DATETIME, isMultiJob INTEGER DEFAULT 0, allocations TEXT, notes TEXT, createdAt DATETIME, updatedAt DATETIME, aiExtracted INTEGER DEFAULT 0, aiConfidence REAL, rawExtraction TEXT);
+    CREATE TABLE invoice_line_items (id TEXT PRIMARY KEY, invoiceId TEXT NOT NULL, description TEXT NOT NULL, quantity REAL NOT NULL, unitPrice REAL NOT NULL, amount REAL NOT NULL, category TEXT);
+    CREATE TABLE daily_reports (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, projectId TEXT NOT NULL, reportDate DATETIME NOT NULL, weatherAM TEXT, weatherPM TEXT, temperature TEXT, workPerformed TEXT, laborSummary TEXT, equipmentUsed TEXT, deliveries TEXT, delays TEXT, safetyIssues TEXT, photos TEXT, createdById TEXT NOT NULL, createdAt DATETIME, updatedAt DATETIME, voiceRecorded INTEGER DEFAULT 0, transcriptId TEXT);
+    CREATE TABLE files (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, projectId TEXT, fileName TEXT NOT NULL, fileType TEXT NOT NULL, mimeType TEXT NOT NULL, fileSize INTEGER NOT NULL, storagePath TEXT NOT NULL, storageUrl TEXT, linkedEntityType TEXT, linkedEntityId TEXT, uploadedAt DATETIME);
+    CREATE TABLE ai_events (id TEXT PRIMARY KEY, accountId TEXT NOT NULL, eventType TEXT NOT NULL, status TEXT DEFAULT 'processing', rawInput TEXT NOT NULL, aiProvider TEXT, aiModel TEXT, aiPrompt TEXT, aiResponse TEXT, aiConfidence REAL, createdEntityType TEXT, createdEntityId TEXT, processingTime INTEGER, errorMessage TEXT, createdAt DATETIME, completedAt DATETIME);
+  `);
+
+  const now = new Date().toISOString();
+  const accId = randomUUID();
+  const userId = randomUUID();
+  const pwHash = bcrypt.hashSync('coaijay1989', 10);
+
+  db.prepare("INSERT INTO accounts (id, companyName, planType, status, createdAt, updatedAt) VALUES (?, 'SiteForge Demo Co.', 'pro', 'active', ?, ?)").run(accId, now, now);
+  db.prepare("INSERT INTO users (id, accountId, email, passwordHash, firstName, lastName, role, phoneNumber, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, 'Jason', 'Manuel', 'owner', '+1-555-0100', 1, ?, ?)").run(userId, accId, 'blunts954@gmail.com', pwHash, now, now);
+}
+
 const db = new Database(dbPath);
+db.pragma('journal_mode = WAL');
+ensureSchema(db);
 
 // Helper to convert SQLite rows to objects with proper types
 function parseRow(row: any) {
