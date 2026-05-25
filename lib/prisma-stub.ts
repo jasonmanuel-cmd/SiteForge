@@ -5,7 +5,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import { randomUUID } from 'crypto';
 
-const dbPath = path.join(process.cwd(), 'prisma', 'dev.db');
+const dbPath = path.join(process.cwd(), 'public', 'dev.db');
 const db = new Database(dbPath);
 
 // Helper to convert SQLite rows to objects with proper types
