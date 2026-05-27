@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { estimatorSchema } from '@/lib/validation'
+import { successResponse } from '@/lib/api-response'
+import { formatErrorResponse, RateLimitError, AuthError } from '@/lib/error-handler'
+import { prisma } from '@/lib/prisma'
+import jwt from 'jsonwebtoken'
 
 const TRADE_PROMPTS: Record<string, string> = {
   framing: `You are an expert framing contractor. Calculate a detailed estimate for wall framing. Return ONLY JSON.`,
@@ -177,18 +182,57 @@ const DEMO_ESTIMATES: Record<string, any> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const { trade, inputs } = await request.json()
+    const body = await request.json()
+    const validated = estimatorSchema.parse(body)
+    const { trade, inputs } = validated
 
-    if (!trade || !inputs) {
-      return NextResponse.json({ error: 'Trade and inputs required' }, { status: 400 })
+    // Extract accountId from JWT token (optional for saving to DB)
+    let accountId: string | null = null
+    const authHeader = request.headers.get('authorization')
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.slice(7)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+        accountId = decoded.accountId
+      } catch {
+        // Token invalid or expired, proceed without saving to DB
+      }
     }
 
     const hasKey = process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes('demo-key')
 
+    let result: any
     if (!hasKey) {
       const calcFn = DEMO_ESTIMATES[trade]
-      if (!calcFn) return NextResponse.json({ error: 'Unknown trade' }, { status: 400 })
-      return NextResponse.json({ ...calcFn(inputs), aiGenerated: false })
+      if (!calcFn) throw new Error(`Unknown trade: ${trade}`)
+      const demoResult = calcFn(inputs)
+      result = Object.assign({}, demoResult, { aiGenerated: false })
+      
+      // Save to DB if authenticated
+      if (accountId) {
+        try {
+          await prisma.estimate.create({
+            data: {
+              accountId,
+              trade,
+              inputs,
+              materials: result.materials,
+              labor: result.labor,
+              subtotal: result.subtotal,
+              taxableSubtotal: result.taxableSubtotal,
+              markup: result.markup,
+              tax: result.tax,
+              total: result.total,
+              aiGenerated: false,
+            },
+          })
+        } catch (dbError) {
+          console.error('Failed to save estimate to DB:', dbError)
+          // Continue despite DB error
+        }
+      }
+      
+      return NextResponse.json(successResponse(result))
     }
 
     const prompt = `${TRADE_PROMPTS[trade]}
@@ -223,11 +267,45 @@ Calculate a DETAILED estimate. Respond with ONLY this JSON (no markdown, no code
     const response = await model.generateContent(prompt)
     const content = response.response.text()
     const cleaned = content.replace(/```json\n?|\n?```/g, '').trim()
-    const result = JSON.parse(cleaned)
+    const parsedResult = JSON.parse(cleaned)
+    result = Object.assign({}, parsedResult, { aiGenerated: true })
 
-    return NextResponse.json({ ...result, aiGenerated: true })
-  } catch (error: any) {
-    console.error('Estimator error:', error)
-    return NextResponse.json({ error: 'Calculation failed', details: error.message }, { status: 500 })
+    // Save to DB if authenticated
+    if (accountId) {
+      try {
+        await prisma.estimate.create({
+          data: {
+            accountId,
+            trade,
+            inputs,
+            materials: result.materials,
+            labor: result.labor,
+            subtotal: result.subtotal,
+            taxableSubtotal: result.taxableSubtotal,
+            markup: result.markup,
+            tax: result.tax,
+            total: result.total,
+            aiGenerated: true,
+          },
+        })
+      } catch (dbError) {
+        console.error('Failed to save estimate to DB:', dbError)
+        // Continue despite DB error
+      }
+    }
+
+    return NextResponse.json(
+      successResponse({ ...result, aiGenerated: true })
+    )
+  } catch (error) {
+    if ((error as any).message?.includes('429')) {
+      const { response, statusCode } = formatErrorResponse(
+        new RateLimitError('API quota exceeded. Using demo calculator.')
+      )
+      return NextResponse.json(response, { status: statusCode })
+    }
+    
+    const { response, statusCode } = formatErrorResponse(error)
+    return NextResponse.json(response, { status: statusCode })
   }
 }

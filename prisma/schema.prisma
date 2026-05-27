@@ -44,7 +44,8 @@ model Account {
   invoices        Invoice[]
   dailyReports    DailyReport[]
   files           File[]
-  aiEvents        AIEvent[]
+  estimates       Estimate[]
+  aiEvents        AiEvent[]
 
   @@map("accounts")
 }
@@ -369,7 +370,38 @@ model File {
 // AI & AUTOMATION
 // ============================================
 
-model AIEvent {
+model Estimate {
+  id              String   @id @default(uuid())
+  accountId       String
+  projectId       String?
+  
+  trade           String   // framing, drywall, concrete, etc.
+  inputs          Json     // Store the input parameters
+  
+  materials       Json     // Array of material line items
+  labor           Json     // {hours, rate, total}
+  subtotal        Decimal  @db.Decimal(12, 2)
+  taxableSubtotal Decimal  @db.Decimal(12, 2)
+  markup          Decimal  @db.Decimal(12, 2)
+  tax             Decimal  @db.Decimal(12, 2)
+  total           Decimal  @db.Decimal(12, 2)
+  
+  aiGenerated     Boolean  @default(false)
+  notes           String?  @db.Text
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  @@index([accountId])
+  @@index([trade])
+  @@index([createdAt])
+  @@map("estimates")
+}
+
+model AiEvent {
   id              String   @id @default(uuid())
   accountId       String
   eventType       String   // email_rfi, email_co, invoice_upload, voice_daily

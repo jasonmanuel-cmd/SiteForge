@@ -7,16 +7,47 @@ import Sidebar from '@/components/Sidebar'
 import DemoTour from '@/components/DemoTour'
 import AIChatbot from '@/components/AIChatbot'
 import { useAuth } from '@/lib/useAuth'
+import { useToast } from '@/lib/toast'
 
 export default function EstimatesPage() {
   const router = useRouter()
-  const { user, account, isDemo, loading, logout } = useAuth()
+  const { user, account, isDemo, loading, logout, token } = useAuth()
+  const { addToast } = useToast()
   const [estimates, setEstimates] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('estimates') || '[]')
-    setEstimates(saved)
-  }, [])
+    const loadEstimates = async () => {
+      setIsLoading(true)
+      try {
+        if (isDemo) {
+          // Load from localStorage for demo mode
+          const saved = JSON.parse(localStorage.getItem('estimates') || '[]')
+          setEstimates(saved)
+        } else if (token) {
+          // Load from database for authenticated users
+          const response = await fetch('/api/estimates', {
+            headers: { 'Authorization': `Bearer ${token}` },
+          })
+          const data = await response.json()
+          if (data.success && Array.isArray(data.data)) {
+            setEstimates(data.data)
+          } else {
+            addToast('Failed to load estimates', 'error')
+          }
+        }
+      } catch (error) {
+        console.error('Error loading estimates:', error)
+        addToast('Error loading estimates', 'error')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (!loading) {
+      loadEstimates()
+    }
+  }, [loading, isDemo, token, addToast])
 
   const getTradeName = (trade: string) => {
     const names: any = {

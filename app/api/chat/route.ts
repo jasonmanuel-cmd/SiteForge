@@ -4,17 +4,15 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { chatSchema } from '@/lib/validation'
+import { successResponse } from '@/lib/api-response'
+import { formatErrorResponse, RateLimitError } from '@/lib/error-handler'
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, history } = await request.json()
-
-    if (!message) {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json()
+    const { message, history } = body
+    const validated = chatSchema.parse({ message })
 
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('demo-key')) {
       const demoResponses = [
@@ -22,9 +20,11 @@ export async function POST(request: NextRequest) {
         "This is a demo response. Add your Gemini API key to enable real AI responses!",
         "Great question! In a live environment with an API key, I'd provide detailed construction insights.",
       ]
-      return NextResponse.json({
-        message: demoResponses[Math.floor(Math.random() * demoResponses.length)]
-      })
+      return NextResponse.json(
+        successResponse({
+          message: demoResponses[Math.floor(Math.random() * demoResponses.length)]
+        })
+      )
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
@@ -48,15 +48,21 @@ Be helpful, professional, and concise. Provide actionable advice specific to con
     })
 
     const chat = model.startChat({ history: geminiHistory })
-    const result = await chat.sendMessage(message)
+    const result = await chat.sendMessage(validated.message)
     const assistantMessage = result.response.text() || 'Sorry, I could not generate a response.'
 
-    return NextResponse.json({ message: assistantMessage })
-  } catch (error: any) {
-    console.error('Chat error:', error)
     return NextResponse.json(
-      { error: 'Failed to process message', details: error.message },
-      { status: 500 }
+      successResponse({ message: assistantMessage })
     )
+  } catch (error) {
+    if ((error as any).message?.includes('429')) {
+      const { response, statusCode } = formatErrorResponse(
+        new RateLimitError('API quota exceeded.')
+      )
+      return NextResponse.json(response, { status: statusCode })
+    }
+    
+    const { response, statusCode } = formatErrorResponse(error)
+    return NextResponse.json(response, { status: statusCode })
   }
 }

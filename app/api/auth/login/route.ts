@@ -1,43 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyPassword, generateToken } from '@/lib/auth'
+import { loginSchema } from '@/lib/validation'
+import { successResponse } from '@/lib/api-response'
+import { formatErrorResponse, AuthError } from '@/lib/error-handler'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const body = await request.json()
+    const validated = loginSchema.parse(body)
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({ where: { email: validated.email } })
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      )
+      throw new AuthError('Invalid email or password')
     }
 
-    const valid = await verifyPassword(password, user.passwordHash)
+    const valid = await verifyPassword(validated.password, user.passwordHash)
 
     if (!valid) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      )
+      throw new AuthError('Invalid email or password')
     }
 
     const account = await prisma.account.findUnique({ where: { id: user.accountId } })
 
     if (!account) {
-      return NextResponse.json(
-        { error: 'Account not found' },
-        { status: 404 }
-      )
+      throw new Error('Account not found')
     }
 
     const token = generateToken({
@@ -47,28 +35,27 @@ export async function POST(request: NextRequest) {
       role: user.role,
     })
 
-    return NextResponse.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        phoneNumber: user.phoneNumber,
-        accountId: user.accountId,
-      },
-      account: {
-        id: account.id,
-        companyName: account.companyName,
-        planType: account.planType,
-      },
-    })
-  } catch (error: any) {
-    console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Login failed', details: error.message },
-      { status: 500 }
+      successResponse({
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          phoneNumber: user.phoneNumber,
+          accountId: user.accountId,
+        },
+        account: {
+          id: account.id,
+          companyName: account.companyName,
+          planType: account.planType,
+        },
+      })
     )
+  } catch (error) {
+    const { response, statusCode } = formatErrorResponse(error)
+    return NextResponse.json(response, { status: statusCode })
   }
 }

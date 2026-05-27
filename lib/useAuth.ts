@@ -25,6 +25,7 @@ export function useAuth() {
   const [account, setAccount] = useState<any>(null)
   const [isDemo, setIsDemo] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -47,6 +48,7 @@ export function useAuth() {
 
     setUser(JSON.parse(userData))
     setAccount(JSON.parse(accountData))
+    setToken(token)
     setLoading(false)
   }, [router])
 
@@ -69,5 +71,5 @@ export function useAuth() {
     router.push('/dashboard')
   }, [router])
 
-  return { user, account, isDemo, loading, logout, loginAsDemo }
+  return { user, account, isDemo, loading, logout, loginAsDemo, token }
 }
