@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Sidebar from '@/components/Sidebar'
 import AIChatbot from '@/components/AIChatbot'
+import { useAuth } from '@/lib/useAuth'
 
 const TRADE_CONFIG: Record<string, {
   name: string; icon: string; color: string;
@@ -87,6 +89,7 @@ const LOCATIONS = ['California', 'Texas', 'Florida', 'New York', 'Arizona', 'Nev
 export default function TradeEstimatorPage() {
   const params = useParams()
   const router = useRouter()
+  const { user, account, isDemo, loading, logout } = useAuth()
   const trade = params.trade as string
 
   const config = TRADE_CONFIG[trade]
@@ -103,10 +106,10 @@ export default function TradeEstimatorPage() {
 
   if (!config) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-sf-cream flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Trade not found</h2>
-          <Link href="/estimator" className="text-blue-600 hover:underline">← Back to Estimator</Link>
+          <h2 className="text-2xl font-bold text-sf-navy mb-4">Trade not found</h2>
+          <Link href="/estimator" className="text-sf-orange hover:underline">← Back to Estimator</Link>
         </div>
       </div>
     )
@@ -157,112 +160,98 @@ export default function TradeEstimatorPage() {
   }
 
   const colorMap: Record<string, string> = {
-    blue: 'bg-blue-600', orange: 'bg-orange-500', gray: 'bg-gray-600',
+    blue: 'bg-sf-navy', orange: 'bg-sf-orange', gray: 'bg-gray-600',
     pink: 'bg-pink-500', yellow: 'bg-yellow-500', cyan: 'bg-cyan-500',
     red: 'bg-red-500', green: 'bg-green-600'
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col">
-        <div className="p-6">
-          <h1 className="text-xl font-bold">Construction SaaS</h1>
-          <p className="text-sm text-gray-400 mt-1">{config.name} Estimator</p>
-        </div>
-        <nav className="flex-1 px-4 space-y-1">
-          <Link href="/dashboard" className="flex items-center px-4 py-2.5 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors text-sm">🏠 Dashboard</Link>
-          <Link href="/estimator" className="flex items-center px-4 py-2.5 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors text-sm">🔧 All Trades</Link>
-          <Link href="/estimates" className="flex items-center px-4 py-2.5 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors text-sm">📋 Saved Estimates</Link>
-          <div className="pt-4 pb-2 px-4 text-xs text-gray-500 uppercase tracking-wider">Other Trades</div>
-          {Object.entries(TRADE_CONFIG).filter(([id]) => id !== trade).map(([id, t]) => (
-            <Link key={id} href={`/estimator/${id}`} className="flex items-center px-4 py-2 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors text-sm">
-              <span className="mr-2">{t.icon}</span>{t.name}
-            </Link>
-          ))}
-        </nav>
-      </div>
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange font-semibold animate-pulse">Loading SiteForge...</div></div>
+  }
 
-      {/* Main */}
-      <div className="ml-64">
-        <main className="px-8 py-6 max-w-6xl">
-          {/* Header */}
+  return (
+    <div className="min-h-screen bg-sf-cream">
+      <Sidebar currentPath="/estimator" user={user} account={account} onLogout={logout} isDemo={isDemo} />
+
+      <div className="ml-64 blueprint-bg min-h-screen relative">
+        <main className="px-8 py-6 max-w-6xl relative z-10">
           <div className="flex items-center space-x-4 mb-8">
             <div className={`w-16 h-16 ${colorMap[config.color]} rounded-2xl flex items-center justify-center text-4xl shadow-lg`}>
               {config.icon}
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">{config.name} Estimator</h2>
+              <h1 className="text-3xl font-bold text-sf-navy font-heading tracking-wide">{config.name} Estimator</h1>
               <p className="text-gray-500">AI-powered estimates with real market pricing</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Form */}
-            <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100 h-fit">
-              <h3 className="text-lg font-bold text-gray-900 mb-5">Project Details</h3>
+            <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6 border border-gray-200 h-fit">
+              <h3 className="text-lg font-bold text-sf-navy font-heading tracking-wide mb-5">Project Details</h3>
 
               <div className="space-y-4">
-                {/* Trade-specific fields */}
                 {config.fields.map(field => (
                   <div key={field.key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label htmlFor={`field-${field.key}`} className="block text-sm font-medium text-gray-700 mb-1.5">
                       {field.label} {field.unit && <span className="text-gray-400">({field.unit})</span>}
                     </label>
                     {field.type === 'select' ? (
                       <select
+                        id={`field-${field.key}`}
                         value={inputs[field.key] || field.default || ''}
                         onChange={e => setInputs({ ...inputs, [field.key]: e.target.value })}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sf-orange focus:border-sf-orange outline-none bg-white"
                       >
                         {field.options?.map(o => <option key={o}>{o}</option>)}
                       </select>
                     ) : (
                       <input
+                        id={`field-${field.key}`}
                         type="number"
                         value={inputs[field.key] || ''}
                         onChange={e => setInputs({ ...inputs, [field.key]: e.target.value })}
                         placeholder={field.placeholder}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sf-orange focus:border-sf-orange outline-none"
                       />
                     )}
                   </div>
                 ))}
 
-                {/* Common fields */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
+                  <label htmlFor="field-location" className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
                   <select
+                    id="field-location"
                     value={inputs.location || 'California'}
                     onChange={e => setInputs({ ...inputs, location: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sf-orange focus:border-sf-orange outline-none bg-white"
                   >
                     {LOCATIONS.map(l => <option key={l}>{l}</option>)}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Your Markup: <span className="text-blue-600 font-bold">{inputs.markup || 25}%</span>
+                  <label htmlFor="field-markup" className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Your Markup: <span className="text-sf-orange font-bold">{inputs.markup || 25}%</span>
                   </label>
                   <input
+                    id="field-markup"
                     type="range"
                     min="10" max="60" step="5"
                     value={inputs.markup || 25}
                     onChange={e => setInputs({ ...inputs, markup: e.target.value })}
-                    className="w-full accent-blue-600"
+                    className="w-full accent-sf-orange"
                   />
                   <div className="flex justify-between text-xs text-gray-400 mt-1">
                     <span>10%</span><span>35%</span><span>60%</span>
                   </div>
                 </div>
 
-                {error && <p className="text-red-600 text-sm bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+                {error && <p role="alert" className="text-red-600 text-sm bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
                 <button
                   onClick={calculate}
                   disabled={isCalculating}
-                  className={`w-full ${colorMap[config.color]} text-white py-3.5 rounded-xl font-bold text-lg hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg`}
+                  className="w-full bg-sf-orange text-white py-3.5 rounded-xl font-bold text-lg hover:bg-sf-orange-dark disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-sm font-heading tracking-wide"
                 >
                   {isCalculating ? (
                     <span className="flex items-center justify-center gap-2">
@@ -277,11 +266,9 @@ export default function TradeEstimatorPage() {
               </div>
             </div>
 
-            {/* Results */}
             <div className="lg:col-span-3">
               {result ? (
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                  {/* Total banner */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                   <div className={`${colorMap[config.color]} text-white rounded-xl p-5 mb-6 flex justify-between items-center`}>
                     <div>
                       <p className="text-white/80 text-sm font-medium">TOTAL ESTIMATE</p>
@@ -293,7 +280,6 @@ export default function TradeEstimatorPage() {
                     </div>
                   </div>
 
-                  {/* Materials */}
                   <div className="mb-5">
                     <h4 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wider text-gray-500">Materials</h4>
                     <div className="space-y-2">
@@ -309,7 +295,6 @@ export default function TradeEstimatorPage() {
                     </div>
                   </div>
 
-                  {/* Labor */}
                   <div className="mb-5 pb-5 border-b border-gray-200">
                     <h4 className="font-bold text-sm uppercase tracking-wider text-gray-500 mb-3">Labor</h4>
                     <div className="flex justify-between text-sm">
@@ -318,7 +303,6 @@ export default function TradeEstimatorPage() {
                     </div>
                   </div>
 
-                  {/* Summary */}
                   <div className="space-y-2 mb-6">
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Subtotal</span><span>${result.subtotal?.toFixed(2)}</span>
@@ -327,7 +311,7 @@ export default function TradeEstimatorPage() {
                       <span>Markup ({inputs.markup}%)</span><span>+${result.markup?.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-gray-600">
-                      <span>Tax (8.75%)</span><span>+${result.tax?.toFixed(2)}</span>
+                      <span>Tax (8.75% on materials only)</span><span>+${result.tax?.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-lg font-bold border-t-2 pt-2">
                       <span>Total</span>
@@ -336,49 +320,48 @@ export default function TradeEstimatorPage() {
                   </div>
 
                   {result.notes && (
-                    <div className="bg-blue-50 rounded-lg p-3 mb-5 text-sm text-blue-800">
+                    <div className="bg-sf-orange/10 rounded-lg p-3 mb-5 text-sm text-sf-orange">
                       <span className="font-semibold">Note: </span>{result.notes}
                     </div>
                   )}
 
-                  {/* Actions */}
                   <div className="grid grid-cols-3 gap-3">
                     <button
                       onClick={saveEstimate}
-                      className={`py-2.5 rounded-xl font-medium text-sm transition-all ${saved ? 'bg-green-100 text-green-700' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+                      className={`py-2.5 rounded-xl font-medium text-sm transition-all ${saved ? 'bg-green-100 text-green-700' : 'bg-sf-navy text-white hover:bg-sf-navy-light'}`}
                     >
                       {saved ? '✓ Saved!' : '💾 Save'}
                     </button>
                     <button
                       onClick={() => router.push('/estimates')}
-                      className="py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 transition-colors"
+                      className="py-2.5 bg-sf-cream text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 transition-colors"
                     >
                       📋 My Estimates
                     </button>
                     <button
                       onClick={() => window.print()}
-                      className="py-2.5 bg-blue-50 text-blue-700 rounded-xl font-medium text-sm hover:bg-blue-100 transition-colors"
+                      className="py-2.5 bg-sf-orange/10 text-sf-orange rounded-xl font-medium text-sm hover:bg-sf-orange/20 transition-colors"
                     >
                       🖨️ Print PDF
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl shadow-lg p-12 border border-gray-100 text-center">
+                <div className="bg-white rounded-2xl shadow-sm p-12 border border-gray-200 text-center">
                   <div className="text-8xl mb-4">{config.icon}</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to estimate!</h3>
+                  <h3 className="text-xl font-bold text-sf-navy mb-2 font-heading tracking-wide">Ready to estimate!</h3>
                   <p className="text-gray-500">Fill in the project details on the left and click "Generate Estimate" to get instant AI-powered pricing.</p>
                   <div className="mt-6 grid grid-cols-3 gap-4 text-sm text-gray-500">
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="font-bold text-gray-900 mb-1">Accurate</div>
+                    <div className="bg-sf-cream rounded-lg p-3">
+                      <div className="font-bold text-sf-navy mb-1">Accurate</div>
                       <div>Real market pricing updated regularly</div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="font-bold text-gray-900 mb-1">Fast</div>
+                    <div className="bg-sf-cream rounded-lg p-3">
+                      <div className="font-bold text-sf-navy mb-1">Fast</div>
                       <div>Get estimates in under 10 seconds</div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="font-bold text-gray-900 mb-1">Saveable</div>
+                    <div className="bg-sf-cream rounded-lg p-3">
+                      <div className="font-bold text-sf-navy mb-1">Saveable</div>
                       <div>Save, print, and share instantly</div>
                     </div>
                   </div>

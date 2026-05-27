@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,12 +16,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo-key')) {
-      // Return demo responses
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('demo-key')) {
       const demoResponses = [
         "I'm here to help with your construction projects! Try asking about RFIs, invoices, or project management.",
-        "This is a demo response. Add your OpenAI API key to enable real AI responses!",
+        "This is a demo response. Add your Gemini API key to enable real AI responses!",
         "Great question! In a live environment with an API key, I'd provide detailed construction insights.",
       ]
       return NextResponse.json({
@@ -29,11 +27,16 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Build conversation history for context
-    const messages = [
-      {
-        role: 'system' as const,
-        content: `You are an expert AI assistant for a construction management SaaS platform. You help users with:
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+
+    const geminiHistory = (history || []).map((msg: any) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }))
+
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      systemInstruction: `You are an expert AI assistant for a construction management SaaS platform. You help users with:
 - Project management and tracking
 - RFI (Request for Information) management
 - Invoice processing and approvals
@@ -41,32 +44,14 @@ export async function POST(request: NextRequest) {
 - Construction industry best practices
 - QuickBooks integration questions
 
-Be helpful, professional, and concise. Provide actionable advice specific to construction projects.`
-      },
-      ...history.map((msg: any) => ({
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content
-      })),
-      {
-        role: 'user' as const,
-        content: message
-      }
-    ]
-
-    // Call OpenAI
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      max_tokens: 500,
-      temperature: 0.7,
+Be helpful, professional, and concise. Provide actionable advice specific to construction projects.`,
     })
 
-    const assistantMessage = response.choices[0]?.message?.content || 'Sorry, I could not generate a response.'
+    const chat = model.startChat({ history: geminiHistory })
+    const result = await chat.sendMessage(message)
+    const assistantMessage = result.response.text() || 'Sorry, I could not generate a response.'
 
-    return NextResponse.json({
-      message: assistantMessage
-    })
+    return NextResponse.json({ message: assistantMessage })
   } catch (error: any) {
     console.error('Chat error:', error)
     return NextResponse.json(

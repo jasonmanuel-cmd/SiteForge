@@ -1,9 +1,7 @@
-/**
- * Prisma Client Singleton
- * Using stub implementation to work around Prisma engine download issues
- */
+import { PrismaClient } from '@prisma/client'
 
-import prismaClient from './prisma-stub'
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined }
 
-// Cast to any to match expected Prisma types
-export const prisma = prismaClient as any
+export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

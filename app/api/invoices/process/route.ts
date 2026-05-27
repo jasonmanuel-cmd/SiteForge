@@ -1,10 +1,10 @@
 /**
  * Invoice Processing API - Real AI Extraction
- * Uses OpenAI Vision API to extract invoice data
+ * Uses Gemini Vision API to extract invoice data
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,11 +18,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo-key')) {
-      // Return demo data with a note
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('demo-key')) {
       return NextResponse.json({
-        vendor: 'Demo Vendor (Add OpenAI API Key for real extraction)',
+        vendor: 'Demo Vendor (Add Gemini API Key for real extraction)',
         invoiceNumber: 'DEMO-' + Math.floor(Math.random() * 10000),
         invoiceDate: new Date().toISOString().split('T')[0],
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -31,7 +29,7 @@ export async function POST(request: NextRequest) {
         total: 17088.75,
         category: 'materials',
         lineItems: [
-          { description: 'Demo Item - Configure OpenAI API Key for real data', quantity: 1, unitPrice: 15750.00, amount: 15750.00 },
+          { description: 'Demo Item - Configure Gemini API Key for real data', quantity: 1, unitPrice: 15750.00, amount: 15750.00 },
         ],
         confidence: 0.90,
         aiGenerated: true,
@@ -39,23 +37,20 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Convert file to base64
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     const base64Image = buffer.toString('base64')
     const mimeType = file.type || 'image/jpeg'
 
-    // Call OpenAI Vision API
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `You are an expert at extracting data from construction invoices. Analyze this invoice image and extract the following information in JSON format:
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+
+    const result = await model.generateContent([
+      {
+        inlineData: { mimeType, data: base64Image },
+      },
+      {
+        text: `You are an expert at extracting data from construction invoices. Analyze this invoice image and extract the following information in JSON format:
 
 {
   "vendor": "company name",
@@ -76,29 +71,18 @@ export async function POST(request: NextRequest) {
   ]
 }
 
-Be as accurate as possible. If a field is not visible, use reasonable defaults. Return ONLY valid JSON, no other text.`,
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${mimeType};base64,${base64Image}`,
-              },
-            },
-          ],
-        },
-      ],
-      max_tokens: 1000,
-    })
+Be as accurate as possible. If a field is not visible, use reasonable defaults. Return ONLY valid JSON, no other text or markdown.`,
+      },
+    ])
 
-    const content = response.choices[0]?.message?.content
+    const content = result.response.text()
     if (!content) {
-      throw new Error('No response from OpenAI')
+      throw new Error('No response from Gemini')
     }
 
-    // Parse the JSON response
-    const extractedData = JSON.parse(content)
+    const cleaned = content.replace(/```json\n?|\n?```/g, '').trim()
+    const extractedData = JSON.parse(cleaned)
 
-    // Add confidence score (GPT-4 Vision is highly accurate)
     return NextResponse.json({
       ...extractedData,
       confidence: 0.95,
