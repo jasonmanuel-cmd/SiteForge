@@ -7,13 +7,13 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to login page for demo
-    router.push('/login')
+    // Redirect to landing page for sales
+    router.push('/landing')
   }, [router])
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-gray-600">Loading demo...</div>
+    <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark">
+      <div className="text-white/60 font-heading tracking-wide animate-pulse">Loading SiteForge...</div>
     </div>
   )
 }

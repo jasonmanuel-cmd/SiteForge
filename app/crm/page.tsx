@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
+import { Modal } from '@/components/Modal'
 import AIChatbot from '@/components/AIChatbot'
 import DemoTour from '@/components/DemoTour'
 import { useAuth } from '@/lib/useAuth'
@@ -152,37 +153,29 @@ export default function CRMPage() {
         </main>
       </div>
 
-      {showAddModal && (
-        <div role="dialog" aria-modal="true" aria-label="Add Contact" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-xl font-bold text-sf-navy font-heading tracking-wide">Add Contact</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div><label htmlFor="crm-name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label><input id="crm-name" value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="John Smith" /></div>
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Contact" ariaLabel="Add Contact">
+        <div className="grid grid-cols-2 gap-4">
+          <div><label htmlFor="crm-name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label><input id="crm-name" value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="John Smith" /></div>
 
-              <div><label htmlFor="crm-company" className="block text-sm font-medium text-gray-700 mb-1">Company</label><input id="crm-company" value={newContact.company} onChange={e => setNewContact({ ...newContact, company: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="ABC Corp" /></div>
+          <div><label htmlFor="crm-company" className="block text-sm font-medium text-gray-700 mb-1">Company</label><input id="crm-company" value={newContact.company} onChange={e => setNewContact({ ...newContact, company: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="ABC Corp" /></div>
 
-              <div><label htmlFor="crm-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label><input id="crm-email" type="email" value={newContact.email} onChange={e => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="john@abc.com" /></div>
+          <div><label htmlFor="crm-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label><input id="crm-email" type="email" value={newContact.email} onChange={e => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="john@abc.com" /></div>
 
-              <div><label htmlFor="crm-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label><input id="crm-phone" value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="(555) 000-0000" /></div>
+          <div><label htmlFor="crm-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label><input id="crm-phone" value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="(555) 000-0000" /></div>
 
-              <div><label htmlFor="crm-type" className="block text-sm font-medium text-gray-700 mb-1">Type</label><select id="crm-type" value={newContact.type} onChange={e => setNewContact({ ...newContact, type: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm bg-white focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none"><option value="prospect">Prospect</option><option value="customer">Customer</option><option value="vendor">Vendor</option><option value="subcontractor">Subcontractor</option></select></div>
+          <div><label htmlFor="crm-type" className="block text-sm font-medium text-gray-700 mb-1">Type</label><select id="crm-type" value={newContact.type} onChange={e => setNewContact({ ...newContact, type: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm bg-white focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none"><option value="prospect">Prospect</option><option value="customer">Customer</option><option value="vendor">Vendor</option><option value="subcontractor">Subcontractor</option></select></div>
 
-              <div><label htmlFor="crm-stage" className="block text-sm font-medium text-gray-700 mb-1">Stage</label><select id="crm-stage" value={newContact.stage} onChange={e => setNewContact({ ...newContact, stage: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm bg-white focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none">{STAGES.map(s => <option key={s}>{s}</option>)}</select></div>
+          <div><label htmlFor="crm-stage" className="block text-sm font-medium text-gray-700 mb-1">Stage</label><select id="crm-stage" value={newContact.stage} onChange={e => setNewContact({ ...newContact, stage: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm bg-white focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none">{STAGES.map(s => <option key={s}>{s}</option>)}</select></div>
 
-              <div className="col-span-2"><label htmlFor="crm-value" className="block text-sm font-medium text-gray-700 mb-1">Deal Value ($)</label><input id="crm-value" type="number" value={newContact.value} onChange={e => setNewContact({ ...newContact, value: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="50000" /></div>
+          <div className="col-span-2"><label htmlFor="crm-value" className="block text-sm font-medium text-gray-700 mb-1">Deal Value ($)</label><input id="crm-value" type="number" value={newContact.value} onChange={e => setNewContact({ ...newContact, value: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" placeholder="50000" /></div>
 
-              <div className="col-span-2"><label htmlFor="crm-notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea id="crm-notes" value={newContact.notes} onChange={e => setNewContact({ ...newContact, notes: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" rows={2} placeholder="Add any notes..." /></div>
-            </div>
-            <div className="flex gap-3 mt-5">
-              <button onClick={addContact} className="flex-1 bg-sf-orange text-white py-2.5 rounded-xl font-bold hover:bg-sf-orange-dark font-heading tracking-wide">Add Contact</button>
-              <button onClick={() => setShowAddModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl font-semibold hover:bg-gray-200">Cancel</button>
-            </div>
-          </div>
+          <div className="col-span-2"><label htmlFor="crm-notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea id="crm-notes" value={newContact.notes} onChange={e => setNewContact({ ...newContact, notes: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none" rows={2} placeholder="Add any notes..." /></div>
         </div>
-      )}
+        <div className="flex gap-3 mt-5">
+          <button onClick={addContact} disabled={!newContact.name} className="flex-1 bg-sf-orange text-white py-2.5 rounded-xl font-bold hover:bg-sf-orange-dark disabled:opacity-50 font-heading tracking-wide">Add Contact</button>
+          <button onClick={() => setShowAddModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl font-semibold hover:bg-gray-200">Cancel</button>
+        </div>
+      </Modal>
 
       <AIChatbot />
       <DemoTour />

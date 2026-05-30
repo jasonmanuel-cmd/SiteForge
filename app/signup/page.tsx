@@ -86,8 +86,8 @@ export default function SignupPage() {
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-sf-orange focus:ring-2 focus:ring-sf-orange/20 outline-none transition-all" />
           </div>
           <button type="submit" disabled={loading}
-            className="w-full bg-sf-orange hover:bg-sf-orange-dark text-white font-bold py-3.5 px-6 rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 font-heading tracking-wide text-lg">
-            {loading ? 'Creating account...' : 'Create Account'}
+            className="w-full bg-sf-orange hover:bg-sf-orange-dark text-white font-bold py-3.5 px-6 rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed font-heading tracking-wide text-lg btn-loading">
+            {loading ? '' : 'Create Account'}
           </button>
         </form>
 
