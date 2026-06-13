@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const { user, account, isDemo, loading, logout } = useAuth()
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange font-semibold animate-pulse">Loading SiteForge...</div></div>
+    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange-aa font-semibold animate-pulse">Loading SiteForge...</div></div>
   }
 
   const stats = getMockData.getProjectStats(account?.id || '')
@@ -43,7 +43,7 @@ export default function DashboardPage() {
                   <p className="text-3xl font-bold text-sf-navy mt-2">{stats.active}</p>
                   <p className="text-xs text-gray-400 mt-1">{stats.total} total</p>
                 </div>
-                <div className="p-3 bg-sf-orange/10 rounded-lg"><svg className="w-8 h-8 text-sf-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg></div>
+                <div className="p-3 bg-sf-orange/10 rounded-lg"><svg className="w-8 h-8 text-sf-orange-aa" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg></div>
               </div>
             </div>
 
@@ -148,3 +148,5 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+

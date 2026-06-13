@@ -76,7 +76,7 @@ export default function CRMPage() {
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm border-l-4 border-l-sf-orange">
               <p className="text-xs text-gray-500 uppercase font-semibold">Active Leads</p>
-              <p className="text-2xl font-bold text-sf-orange mt-1">{pipelineContacts.filter(c => !['Won', 'Lost'].includes(c.stage)).length}</p>
+              <p className="text-2xl font-bold text-sf-orange-aa mt-1">{pipelineContacts.filter(c => !['Won', 'Lost'].includes(c.stage)).length}</p>
             </div>
           </div>
 
@@ -139,11 +139,11 @@ export default function CRMPage() {
                   {filtered.map(contact => (
                     <tr key={contact.id} className="hover:bg-sf-orange/5">
                       <td className="px-5 py-3.5"><p className="font-semibold text-sf-navy text-sm">{contact.name}</p><p className="text-xs text-gray-500">{contact.company}</p></td>
-                      <td className="px-5 py-3.5"><span className="px-2 py-1 rounded-full text-xs font-semibold capitalize bg-sf-orange/10 text-sf-orange">{contact.type}</span></td>
+                      <td className="px-5 py-3.5"><span className="px-2 py-1 rounded-full text-xs font-semibold capitalize bg-sf-orange/10 text-sf-orange-aa">{contact.type}</span></td>
                       <td className="px-5 py-3.5"><select value={contact.stage} onChange={e => moveStage(contact.id, e.target.value)} className="text-xs border border-gray-200 rounded-lg px-2 py-1">{STAGES.map(s => <option key={s}>{s}</option>)}</select></td>
                       <td className="px-5 py-3.5 font-semibold text-sm text-sf-navy">{contact.value > 0 ? `$${contact.value.toLocaleString()}` : '-'}</td>
                       <td className="px-5 py-3.5 text-xs text-gray-500">{contact.lastContact}</td>
-                      <td className="px-5 py-3.5"><div className="flex gap-2"><a href={`mailto:${contact.email}`} className="p-1.5 bg-sf-orange/10 text-sf-orange rounded hover:bg-sf-orange/20">✉</a><button onClick={() => deleteContact(contact.id)} className="p-1.5 bg-red-50 text-red-500 rounded hover:bg-red-100 text-xs">✕</button></div></td>
+                      <td className="px-5 py-3.5"><div className="flex gap-2"><a href={`mailto:${contact.email}`} className="p-1.5 bg-sf-orange/10 text-sf-orange-aa rounded hover:bg-sf-orange/20">✉</a><button onClick={() => deleteContact(contact.id)} className="p-1.5 bg-red-50 text-red-500 rounded hover:bg-red-100 text-xs">✕</button></div></td>
                     </tr>
                   ))}
                 </tbody>
@@ -182,3 +182,5 @@ export default function CRMPage() {
     </div>
   )
 }
+
+

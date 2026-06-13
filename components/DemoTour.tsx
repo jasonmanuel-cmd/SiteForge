@@ -59,7 +59,7 @@ export default function DemoTour() {
   const progress = ((currentStep + 1) / demoSteps.length) * 100
 
   return (
-    <div role="dialog" aria-label="Demo tour" className="fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl border-2 border-sf-navy/20 p-6 max-w-md w-full z-50 animate-slide-up">
+      <div role="dialog" aria-label="Demo tour" className="fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl border-2 border-sf-navy/20 p-6 max-w-md w-full z-50 animate-slide-up">
       <div aria-hidden="true" className="absolute top-0 left-0 right-0 h-1 bg-gray-200 rounded-t-2xl overflow-hidden">
         <div className="h-full bg-sf-orange transition-all duration-500" style={{ width: `${progress}%` }} />
       </div>
@@ -95,6 +95,6 @@ export default function DemoTour() {
           <span>Auto-advancing...</span>
         </div>
       </div>
-    </div>
+      </div>
   )
 }

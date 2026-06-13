@@ -93,7 +93,7 @@ export default function FramingEstimatorPage() {
   }
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange font-semibold animate-pulse">Loading SiteForge...</div></div>
+    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange-aa font-semibold animate-pulse">Loading SiteForge...</div></div>
   }
 
   return (
@@ -245,7 +245,7 @@ export default function FramingEstimatorPage() {
                     </div>
                     <div className="flex justify-between text-lg font-bold pt-3 border-t-2 border-gray-300">
                       <span>Total</span>
-                      <span className="text-sf-orange">${result.total.toFixed(2)}</span>
+                      <span className="text-sf-orange-aa">${result.total.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -273,3 +273,5 @@ export default function FramingEstimatorPage() {
     </div>
   )
 }
+
+

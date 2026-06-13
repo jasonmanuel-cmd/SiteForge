@@ -84,7 +84,7 @@ export default function ProjectsPage() {
                     <div className="flex justify-between text-xs mt-1"><span className="text-gray-400">${(Number(project.actualCost) / 1000).toFixed(0)}k spent</span><span className="text-gray-400">${(Number(project.estimatedBudget) / 1000).toFixed(0)}k budget</span></div>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="flex-1 px-4 py-2 bg-sf-orange/10 text-sf-orange rounded-lg hover:bg-sf-orange/20 transition-colors text-sm font-medium">View Details</button>
+                    <button className="flex-1 px-4 py-2 bg-sf-orange/10 text-sf-orange-aa rounded-lg hover:bg-sf-orange/20 transition-colors text-sm font-medium">View Details</button>
                     <button className="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg hover:bg-gray-200 transition-colors text-sm">⚙️</button>
                   </div>
                 </div>
@@ -131,3 +131,5 @@ export default function ProjectsPage() {
     </div>
   )
 }
+
+

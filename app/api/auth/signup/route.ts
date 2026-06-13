@@ -76,7 +76,9 @@ export async function POST(request: NextRequest) {
         account: { 
           id: accountId, 
           companyName: validated.businessName, 
-          planType: 'trial' 
+          planType: 'trial',
+          subscriptionStatus: null,
+          stripeCustomerId: null,
         },
       })
     )

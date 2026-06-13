@@ -43,10 +43,9 @@ export function Modal({ isOpen, onClose, children, title, ariaLabel }: ModalProp
       previousFocusRef.current = document.activeElement as HTMLElement
       document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
-      // Focus first focusable element after mount
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         overlayRef.current?.querySelector<HTMLElement>('button, input, select, textarea')?.focus()
-      }, 50)
+      })
     }
     return () => {
       document.removeEventListener('keydown', handleKeyDown)

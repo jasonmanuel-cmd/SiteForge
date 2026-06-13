@@ -17,6 +17,8 @@ const DEMO_ACCOUNT = {
   id: 'demo-account-id',
   companyName: 'Demo Construction Co.',
   planType: 'trial',
+  subscriptionStatus: null,
+  stripeCustomerId: null,
 }
 
 export function useAuth() {

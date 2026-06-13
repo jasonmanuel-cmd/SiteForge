@@ -63,3 +63,13 @@ export function extractTokenFromHeader(
   }
   return authHeader.substring(7)
 }
+
+/**
+ * Get JWT payload from request, returns null if not authenticated
+ */
+export function getToken(request: { headers: { get: (name: string) => string | null } }): JWTPayload | null {
+  const authHeader = request.headers.get('authorization')
+  const token = extractTokenFromHeader(authHeader)
+  if (!token) return null
+  return verifyToken(token)
+}

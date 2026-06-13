@@ -107,3 +107,5 @@ export default function Sidebar({ currentPath, user, account, onLogout, isDemo }
     </aside>
   )
 }
+
+

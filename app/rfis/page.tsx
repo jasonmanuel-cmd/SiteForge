@@ -42,7 +42,7 @@ export default function RFIsPage() {
     switch (priority) {
       case 'urgent': return 'text-red-600'
       case 'high': return 'text-orange-600'
-      case 'normal': return 'text-sf-orange'
+      case 'normal': return 'text-sf-orange-aa'
       case 'low': return 'text-gray-500'
       default: return 'text-gray-500'
     }
@@ -110,14 +110,14 @@ export default function RFIsPage() {
                     const project = projects.find(p => p.id === rfi.projectId)
                     return (
                       <tr key={rfi.id} className="hover:bg-sf-orange/5">
-                        <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center space-x-2"><span className="text-sm font-bold text-sf-orange">{rfi.rfiNumber}</span>{rfi.aiGenerated && <span className="px-2 py-0.5 bg-purple-100 text-purple-600 rounded text-xs font-medium">AI</span>}</div></td>
+                        <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center space-x-2"><span className="text-sm font-bold text-sf-orange-aa">{rfi.rfiNumber}</span>{rfi.aiGenerated && <span className="px-2 py-0.5 bg-purple-100 text-purple-600 rounded text-xs font-medium">AI</span>}</div></td>
                         <td className="px-6 py-4"><div className="max-w-xs"><p className="text-sm font-medium text-sf-navy truncate">{rfi.subject}</p><p className="text-xs text-gray-500 truncate">{rfi.question}</p></div></td>
                         <td className="px-6 py-4"><p className="text-sm text-gray-500 truncate max-w-xs">{project?.name || 'N/A'}</p></td>
                         <td className="px-6 py-4 whitespace-nowrap"><span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(rfi.status)}`}>{rfi.status.charAt(0).toUpperCase() + rfi.status.slice(1)}</span></td>
                         <td className="px-6 py-4 whitespace-nowrap"><span className={`text-sm font-bold ${getPriorityColor(rfi.priority)}`}>{rfi.priority.charAt(0).toUpperCase() + rfi.priority.slice(1)}</span></td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{rfi.dueDate ? new Date(rfi.dueDate).toLocaleDateString() : '-'}</td>
                         <td className="px-6 py-4 whitespace-nowrap"><div className="flex space-x-2">
-                          <button className="p-2 text-sf-orange hover:bg-sf-orange/10 rounded-lg transition-colors" title="View"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
+                          <button className="p-2 text-sf-orange-aa hover:bg-sf-orange/10 rounded-lg transition-colors" title="View"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
                           <button className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors" title="Edit"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
                         </div></td>
                       </tr>
@@ -163,3 +163,5 @@ export default function RFIsPage() {
     </div>
   )
 }
+
+

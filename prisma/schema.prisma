@@ -23,6 +23,12 @@ model Account {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  // Stripe Billing
+  stripeCustomerId String? @unique
+  subscriptionId   String? @unique
+  subscriptionStatus String? // active, past_due, canceled, incomplete, trialing
+  trialEndsAt      DateTime?
+
   // QuickBooks Integration
   qbRealmId       String?  @unique
   qbAccessToken   String?  @db.Text

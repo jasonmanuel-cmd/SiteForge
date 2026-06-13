@@ -41,7 +41,7 @@ export default function SignupPage() {
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-sf-navy rounded-2xl mb-4 shadow-lg">
-            <span className="text-3xl font-bold text-sf-orange font-heading tracking-wide">SF</span>
+            <span className="text-3xl font-bold text-sf-orange-aa font-heading tracking-wide">SF</span>
           </div>
           <h1 className="text-3xl font-bold text-sf-navy font-heading tracking-wide">Create Account</h1>
           <div className="h-0.5 w-16 bg-sf-orange mx-auto mt-3 mb-3" />
@@ -94,16 +94,18 @@ export default function SignupPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
             Already have an account?{' '}
-            <a href="/login" className="text-sf-orange font-semibold hover:underline">Sign in</a>
+            <a href="/login" className="text-sf-orange-aa font-semibold hover:underline">Sign in</a>
           </p>
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-100 text-center">
           <p className="text-xs text-gray-400">
-            Powered by <span className="font-semibold text-sf-orange">COAI</span> &middot; Bakersfield, CA
+            Powered by <span className="font-semibold text-sf-orange-aa">COAI</span> &middot; Bakersfield, CA
           </p>
         </div>
       </div>
     </div>
   )
 }
+
+

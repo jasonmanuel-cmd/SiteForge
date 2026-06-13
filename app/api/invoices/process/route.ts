@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { successResponse } from '@/lib/api-response'
+import { formatErrorResponse, RateLimitError, ValidationError } from '@/lib/error-handler'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,14 +14,12 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
+      const { response, statusCode } = formatErrorResponse(new ValidationError('No file provided'))
+      return NextResponse.json(response, { status: statusCode })
     }
 
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('demo-key')) {
-      return NextResponse.json({
+      return NextResponse.json(successResponse({
         vendor: 'Demo Vendor (Add Gemini API Key for real extraction)',
         invoiceNumber: 'DEMO-' + Math.floor(Math.random() * 10000),
         invoiceDate: new Date().toISOString().split('T')[0],
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         confidence: 0.90,
         aiGenerated: true,
         demoMode: true,
-      })
+      }))
     }
 
     const bytes = await file.arrayBuffer()
@@ -83,16 +83,17 @@ Be as accurate as possible. If a field is not visible, use reasonable defaults. 
     const cleaned = content.replace(/```json\n?|\n?```/g, '').trim()
     const extractedData = JSON.parse(cleaned)
 
-    return NextResponse.json({
+    return NextResponse.json(successResponse({
       ...extractedData,
       confidence: 0.95,
       aiGenerated: true,
-    })
+    }))
   } catch (error: any) {
-    console.error('Invoice processing error:', error)
-    return NextResponse.json(
-      { error: 'Failed to process invoice', details: error.message },
-      { status: 500 }
-    )
+    if (error.message?.includes('429')) {
+      const { response, statusCode } = formatErrorResponse(new RateLimitError())
+      return NextResponse.json(response, { status: statusCode })
+    }
+    const { response, statusCode } = formatErrorResponse(error)
+    return NextResponse.json(response, { status: statusCode })
   }
 }

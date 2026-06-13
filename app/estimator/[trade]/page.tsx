@@ -109,7 +109,7 @@ export default function TradeEstimatorPage() {
       <div className="min-h-screen bg-sf-cream flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-sf-navy mb-4">Trade not found</h2>
-          <Link href="/estimator" className="text-sf-orange hover:underline">← Back to Estimator</Link>
+          <Link href="/estimator" className="text-sf-orange-aa hover:underline">← Back to Estimator</Link>
         </div>
       </div>
     )
@@ -166,7 +166,7 @@ export default function TradeEstimatorPage() {
   }
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange font-semibold animate-pulse">Loading SiteForge...</div></div>
+    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange-aa font-semibold animate-pulse">Loading SiteForge...</div></div>
   }
 
   return (
@@ -231,7 +231,7 @@ export default function TradeEstimatorPage() {
 
                 <div>
                   <label htmlFor="field-markup" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Your Markup: <span className="text-sf-orange font-bold">{inputs.markup || 25}%</span>
+                    Your Markup: <span className="text-sf-orange-aa font-bold">{inputs.markup || 25}%</span>
                   </label>
                   <input
                     id="field-markup"
@@ -320,7 +320,7 @@ export default function TradeEstimatorPage() {
                   </div>
 
                   {result.notes && (
-                    <div className="bg-sf-orange/10 rounded-lg p-3 mb-5 text-sm text-sf-orange">
+                    <div className="bg-sf-orange/10 rounded-lg p-3 mb-5 text-sm text-sf-orange-aa">
                       <span className="font-semibold">Note: </span>{result.notes}
                     </div>
                   )}
@@ -340,7 +340,7 @@ export default function TradeEstimatorPage() {
                     </button>
                     <button
                       onClick={() => window.print()}
-                      className="py-2.5 bg-sf-orange/10 text-sf-orange rounded-xl font-medium text-sm hover:bg-sf-orange/20 transition-colors"
+                      className="py-2.5 bg-sf-orange/10 text-sf-orange-aa rounded-xl font-medium text-sm hover:bg-sf-orange/20 transition-colors"
                     >
                       🖨️ Print PDF
                     </button>
@@ -375,3 +375,4 @@ export default function TradeEstimatorPage() {
     </div>
   )
 }
+

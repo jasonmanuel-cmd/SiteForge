@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface Message { role: 'user' | 'assistant'; content: string }
 
@@ -101,6 +101,8 @@ export default function AIChatbot() {
         </div>
         <p className="text-[10px] text-gray-400 mt-2 text-center">Powered by AI &middot; Construction expert</p>
       </div>
-    </div>
-  )
+      </div>
+    )
 }
+
+

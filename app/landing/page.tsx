@@ -47,7 +47,7 @@ export default function LandingPage() {
           <h1 className="text-5xl md:text-7xl font-bold font-heading leading-[1.05] tracking-wide mb-8">
             Stop Losing Money<br />
             Between the Bid<br />
-            and the <span className="text-sf-orange">Built.</span>
+            and the <span className="text-sf-orange-aa">Built.</span>
           </h1>
           <p className="text-xl text-white/60 leading-relaxed mb-10 max-w-2xl">
             SiteForge is the AI-powered construction management platform that turns your phone into a full office. Estimates, invoices, RFIs, change orders, CRM — one system. One login. Zero excuses.
@@ -85,7 +85,7 @@ export default function LandingPage() {
       <section className="relative z-40 bg-sf-cream text-sf-text py-24">
         <div className="max-w-7xl mx-auto px-8">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <p className="text-sf-orange font-bold uppercase tracking-widest text-sm mb-4">The Problem</p>
+            <p className="text-sf-orange-aa font-bold uppercase tracking-widest text-sm mb-4">The Problem</p>
             <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-wide text-sf-navy leading-tight">
               You Became a Contractor to Build Things.<br />
               Not to Fight With Spreadsheets.
@@ -112,7 +112,7 @@ export default function LandingPage() {
       <section id="features" className="relative z-40 bg-white text-sf-text py-24">
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-16">
-            <p className="text-sf-orange font-bold uppercase tracking-widest text-sm mb-4">The Solution</p>
+            <p className="text-sf-orange-aa font-bold uppercase tracking-widest text-sm mb-4">The Solution</p>
             <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-wide text-sf-navy mb-6">
               Everything Your Business Needs.<br />Nothing You Don&apos;t.
             </h2>
@@ -145,7 +145,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="text-sf-orange font-bold uppercase tracking-widest text-sm mb-4">AI Estimator</p>
+              <p className="text-sf-orange-aa font-bold uppercase tracking-widest text-sm mb-4">AI Estimator</p>
               <h2 className="text-4xl font-bold font-heading tracking-wide mb-6">
                 Quote Jobs Before<br />
                 Your Competitor Finishes<br />
@@ -193,8 +193,8 @@ export default function LandingPage() {
                     <span className="text-white font-medium">$2,269</span>
                   </div>
                   <div className="flex justify-between text-sm font-bold border-t border-white/10 pt-3 mt-3">
-                    <span className="text-sf-orange">Total Estimate</span>
-                    <span className="text-sf-orange text-lg">$33,569</span>
+                    <span className="text-sf-orange-aa">Total Estimate</span>
+                    <span className="text-sf-orange-aa text-lg">$33,569</span>
                   </div>
                 </div>
               </div>
@@ -207,7 +207,7 @@ export default function LandingPage() {
       <section className="relative z-40 bg-sf-cream text-sf-text py-24">
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-16">
-            <p className="text-sf-orange font-bold uppercase tracking-widest text-sm mb-4">Trusted by Contractors</p>
+            <p className="text-sf-orange-aa font-bold uppercase tracking-widest text-sm mb-4">Trusted by Contractors</p>
             <h2 className="text-4xl font-bold font-heading tracking-wide text-sf-navy">Built With the Trades. For the Trades.</h2>
           </div>
 
@@ -218,7 +218,7 @@ export default function LandingPage() {
               { name: 'Robert G.', role: 'Multi-Trade Contractor', quote: 'I run three crews across five active sites. SiteForge is the only thing keeping me from losing my mind. The CRM alone is worth it.', stars: '★★★★★' },
             ].map((review, i) => (
               <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-                <div className="text-sf-orange text-lg mb-4">{review.stars}</div>
+                <div className="text-sf-orange-aa text-lg mb-4">{review.stars}</div>
                 <p className="text-gray-700 leading-relaxed mb-6 italic">&ldquo;{review.quote}&rdquo;</p>
                 <div>
                   <p className="font-bold text-sf-navy font-heading">{review.name}</p>
@@ -234,7 +234,7 @@ export default function LandingPage() {
       <section id="pricing" className="relative z-40 bg-white text-sf-text py-24">
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-16">
-            <p className="text-sf-orange font-bold uppercase tracking-widest text-sm mb-4">Pricing</p>
+            <p className="text-sf-orange-aa font-bold uppercase tracking-widest text-sm mb-4">Pricing</p>
             <h2 className="text-4xl font-bold font-heading tracking-wide text-sf-navy mb-4">
               Start Free. Scale When You&apos;re Ready.
             </h2>
@@ -249,7 +249,7 @@ export default function LandingPage() {
               <ul className="space-y-3 mb-8">
                 {['Up to 3 active projects', 'AI Estimator (all 8 trades)', 'Basic CRM (up to 50 contacts)', 'Invoice tracking', 'Email support'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="text-sf-orange">✓</span> {f}
+                    <span className="text-sf-orange-aa">✓</span> {f}
                   </li>
                 ))}
               </ul>
@@ -268,7 +268,7 @@ export default function LandingPage() {
               <ul className="space-y-3 mb-8">
                 {['Unlimited projects', 'Everything in Starter', 'QuickBooks sync', 'AI invoice from photo', 'Priority support', 'RFI & Change Order tracking', 'Team access (up to 5)'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-white/70">
-                    <span className="text-sf-orange">✓</span> {f}
+                    <span className="text-sf-orange-aa">✓</span> {f}
                   </li>
                 ))}
               </ul>
@@ -284,7 +284,7 @@ export default function LandingPage() {
               <ul className="space-y-3 mb-8">
                 {['Everything in Professional', 'Unlimited team members', 'Custom onboarding', 'API access', 'Dedicated account manager', 'Custom integrations', 'SLA guarantee'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="text-sf-orange">✓</span> {f}
+                    <span className="text-sf-orange-aa">✓</span> {f}
                   </li>
                 ))}
               </ul>
@@ -300,7 +300,7 @@ export default function LandingPage() {
       <section className="relative z-40 bg-sf-navy-dark text-white py-24">
         <div className="max-w-4xl mx-auto px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-wide mb-6">
-            Every Hour Spent on Admin<br />Is an Hour You&apos;re <span className="text-sf-orange">Not Getting Paid.</span>
+            Every Hour Spent on Admin<br />Is an Hour You&apos;re <span className="text-sf-orange-aa">Not Getting Paid.</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto mb-10">
             Join contractors who&apos;ve already made the switch. Start your free trial today. See what running your business actually feels like.
@@ -345,3 +345,5 @@ export default function LandingPage() {
     </div>
   )
 }
+
+

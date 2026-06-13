@@ -89,7 +89,7 @@ export default function ChangeOrdersPage() {
                       </div>
                       <h3 className="text-xl font-bold text-sf-navy font-heading tracking-wide mb-2">{co.title}</h3>
                       <p className="text-sm text-gray-500 mb-3">{co.description}</p>
-                      {co.reason && <div className="bg-sf-orange/5 border border-sf-orange/20 rounded-lg p-3 mb-3"><p className="text-xs font-semibold text-sf-orange mb-1">Reason:</p><p className="text-sm text-gray-700">{co.reason}</p></div>}
+                      {co.reason && <div className="bg-sf-orange/5 border border-sf-orange/20 rounded-lg p-3 mb-3"><p className="text-xs font-semibold text-sf-orange-aa mb-1">Reason:</p><p className="text-sm text-gray-700">{co.reason}</p></div>}
                       <div className="flex items-center space-x-4 text-sm mb-3">
                         <span className="font-semibold text-gray-900">Price: <span className={Number(co.priceImpact) >= 0 ? 'text-green-600' : 'text-red-600'}>{Number(co.priceImpact) >= 0 ? '+' : ''}${Number(co.priceImpact).toLocaleString()}</span></span>
                         <span className="font-semibold text-gray-900">Schedule: <span className={co.scheduleImpact > 0 ? 'text-orange-600' : 'text-green-600'}>{co.scheduleImpact > 0 ? '+' : ''}{co.scheduleImpact} days</span></span>
@@ -101,7 +101,7 @@ export default function ChangeOrdersPage() {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="px-4 py-2 bg-sf-orange/10 text-sf-orange rounded-lg hover:bg-sf-orange/20 transition-colors text-sm font-medium">View Details</button>
+                    <button className="px-4 py-2 bg-sf-orange/10 text-sf-orange-aa rounded-lg hover:bg-sf-orange/20 transition-colors text-sm font-medium">View Details</button>
                     {co.status === 'pending' && <><button className="px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium">Approve</button><button className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium">Reject</button></>}
                   </div>
                 </div>
@@ -162,3 +162,5 @@ export default function ChangeOrdersPage() {
     </div>
   )
 }
+
+

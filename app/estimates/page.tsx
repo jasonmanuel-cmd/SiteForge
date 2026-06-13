@@ -88,7 +88,7 @@ export default function EstimatesPage() {
   const totalValue = estimates.reduce((sum, est) => sum + (est.result?.total || 0), 0)
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange font-semibold animate-pulse">Loading SiteForge...</div></div>
+    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange-aa font-semibold animate-pulse">Loading SiteForge...</div></div>
   }
 
   return (
@@ -144,7 +144,7 @@ export default function EstimatesPage() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-500">Total</p>
-                        <p className="text-2xl font-bold text-sf-orange">${estimate.result?.total.toFixed(2)}</p>
+                        <p className="text-2xl font-bold text-sf-orange-aa">${estimate.result?.total.toFixed(2)}</p>
                       </div>
                     </div>
 
@@ -178,7 +178,7 @@ export default function EstimatesPage() {
                     <div className="flex space-x-3">
                       <button
                         onClick={() => router.push(`/estimator/${estimate.trade}`)}
-                        className="flex-1 px-4 py-2 bg-sf-orange/10 text-sf-orange rounded-lg hover:bg-sf-orange/20 transition-colors font-medium"
+                        className="flex-1 px-4 py-2 bg-sf-orange/10 text-sf-orange-aa rounded-lg hover:bg-sf-orange/20 transition-colors font-medium"
                       >
                         Edit
                       </button>
@@ -221,3 +221,5 @@ export default function EstimatesPage() {
     </div>
   )
 }
+
+

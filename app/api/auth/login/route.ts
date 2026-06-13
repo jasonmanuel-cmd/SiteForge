@@ -51,6 +51,8 @@ export async function POST(request: NextRequest) {
           id: account.id,
           companyName: account.companyName,
           planType: account.planType,
+          subscriptionStatus: account.subscriptionStatus,
+          stripeCustomerId: account.stripeCustomerId,
         },
       })
     )

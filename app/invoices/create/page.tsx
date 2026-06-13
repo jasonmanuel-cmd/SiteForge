@@ -69,7 +69,7 @@ export default function CreateInvoicePage() {
   }
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange font-semibold animate-pulse">Loading SiteForge...</div></div>
+    return <div className="flex min-h-screen items-center justify-center bg-sf-navy-dark"><div className="text-sf-orange-aa font-semibold animate-pulse">Loading SiteForge...</div></div>
   }
 
   return (
@@ -183,7 +183,7 @@ export default function CreateInvoicePage() {
                   ))}
                   <button
                     onClick={addLine}
-                    className="w-full py-2 border-2 border-dashed border-gray-300 text-gray-500 hover:border-sf-orange hover:text-sf-orange rounded-lg text-sm font-medium transition-colors"
+                    className="w-full py-2 border-2 border-dashed border-gray-300 text-gray-500 hover:border-sf-orange hover:text-sf-orange-aa rounded-lg text-sm font-medium transition-colors"
                   >
                     + Add Line Item
                   </button>
@@ -261,7 +261,7 @@ export default function CreateInvoicePage() {
                   </div>
                   <div className="flex justify-between text-xl font-bold border-t pt-2 mt-2">
                     <span>Total</span>
-                    <span className="text-sf-orange">${total.toFixed(2)}</span>
+                    <span className="text-sf-orange-aa">${total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -295,3 +295,5 @@ export default function CreateInvoicePage() {
     </div>
   )
 }
+
+

@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </button>
             <button
               onClick={() => window.location.href = '/dashboard'}
-              className="block mt-3 text-sm text-gray-500 hover:text-sf-orange transition-colors mx-auto"
+              className="block mt-3 text-sm text-gray-500 hover:text-sf-orange-aa transition-colors mx-auto"
             >
               Go to Dashboard
             </button>
@@ -62,3 +62,5 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
+
+

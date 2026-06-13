@@ -45,7 +45,7 @@ export default function LoginPage() {
         {/* Hard hat logo area */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-sf-navy rounded-2xl mb-4 shadow-lg">
-            <span className="text-3xl font-bold text-sf-orange font-heading tracking-wide">SF</span>
+            <span className="text-3xl font-bold text-sf-orange-aa font-heading tracking-wide">SF</span>
           </div>
           <h1 className="text-3xl font-bold text-sf-navy font-heading tracking-wide">SiteForge</h1>
           <div className="h-0.5 w-16 bg-sf-orange mx-auto mt-3 mb-3" />
@@ -90,16 +90,18 @@ export default function LoginPage() {
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-500">
             Don't have an account?{' '}
-            <a href="/signup" className="text-sf-orange font-semibold hover:underline">Sign up</a>
+            <a href="/signup" className="text-sf-orange-aa font-semibold hover:underline">Sign up</a>
           </p>
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-100 text-center">
           <p className="text-xs text-gray-400">
-            Powered by <span className="font-semibold text-sf-orange">COAI</span> &middot; Bakersfield, CA
+            Powered by <span className="font-semibold text-sf-orange-aa">COAI</span> &middot; Bakersfield, CA
           </p>
         </div>
       </div>
     </div>
   )
 }
+
+
