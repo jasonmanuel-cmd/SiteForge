@@ -38,7 +38,7 @@
     "stripe": "^22.2.1",
     "uuid": "^13.0.0",
     "vitest": "^4.1.7",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@prisma/engines": "^5.22.0",
